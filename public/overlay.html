@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Overlay Super Gemoy Ultimate V5</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* === CSS sama persis dengan punyamu kemarin === */
+</style>
+</head>
+<body>
+<button class="toggle-btn" onclick="toggleDark()">🌙 Dark Mode</button>
+<div class="wrap" id="wrap">
+  <h3 class="title"><span class="dot"></span> TOP 3 Komentar Terbanyak</h3>
+  <div class="timer-wrapper">
+    <span class="heart">❤️</span>
+    <div class="timer"><span id="timerText">Reset dalam —</span></div>
+  </div>
+  <div class="bar"><div class="fill" id="fill"></div></div>
+  <div class="grid" id="list"></div>
+  <div class="note">Tip: ubah durasi via <code>?reset=90</code></div>
+</div>
+
+<script>
+const qs = new URLSearchParams(location.search);
+const RESET_QS = parseInt(qs.get('reset')||'60',10);
+let serverResetInterval = RESET_QS;
+let serverTimeRemaining = RESET_QS;
+let darkMode=false;
+
+function toggleDark(){
+  darkMode = !darkMode;
+  document.body.classList.toggle('dark', darkMode);
+}
+
+async function fetchTop3(){
+  try{
+    const res = await fetch(`/top3?reset=${RESET_QS}`);
+    const data = await res.json();
+    const top3 = data.top3 || [];
+    serverResetInterval = data.resetInterval || RESET_QS || 60;
+    serverTimeRemaining = data.timeRemaining ?? serverTimeRemaining;
+    const list = document.getElementById('list');
+    list.innerHTML = '';
+    top3.forEach((row, idx) => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      const avatarURL = row.avatar || `https://i.pravatar.cc/28?img=${idx+1}`;
+      div.innerHTML = `
+        <div class="rank rank-${idx+1}">${idx+1}</div>
+        <div class="txt"><img class="avatar" src="${avatarURL}">${escapeHTML(row.text)}</div>
+        <div class="cnt">${row.count}</div>
+      `;
+      list.appendChild(div);
+    });
+  }catch(e){console.error(e);}
+}
+
+function escapeHTML(s=''){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+
+function tick(){
+  const t = document.getElementById('timerText');
+  const fill = document.getElementById('fill');
+  if(serverResetInterval <= 0) serverResetInterval = 60;
+  if(serverTimeRemaining < 0) serverTimeRemaining = serverResetInterval;
+  t.textContent = `Reset dalam ${serverTimeRemaining}s`;
+  const p = Math.max(0, Math.min(1, serverTimeRemaining / serverResetInterval));
+  fill.style.transform = `scaleX(${p})`;
+  serverTimeRemaining -= 1;
+}
+
+setInterval(fetchTop3, 1500);
+setInterval(tick, 1000);
+fetchTop3(); tick();
+</script>
+</body>
+</html>

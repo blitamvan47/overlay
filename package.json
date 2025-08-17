@@ -1,0 +1,14 @@
+{
+  "name": "tiktok-overlay",
+  "version": "1.0.0",
+  "description": "TikTok Live Overlay Top 3 Komentar",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "tiktok-live-connector": "^0.8.0",
+    "ws": "^8.14.2"
+  }
+}
