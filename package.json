@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "tiktok-live-connector": "^0.8.0",
+    "tiktok-live-connector": "github:zerodytrash/TikTok-Live-Connector",
     "ws": "^8.14.2"
   }
 }
